@@ -11,6 +11,23 @@ import (
 
 var pemPath = "/.ssh/id_rsa"
 
+type Env string
+
+func (e *Env) String() string{
+	return string(*e)
+}
+
+var (
+	Sandbox          Env = "Sandbox"
+	Dev              Env = "Dev"
+	Stage            Env = "Stage"
+	Prod             Env = "Prod"
+	MassclarityDev   Env = "MassclarityDev"
+	MassclarityStage Env = "MassclarityStage"
+	MassclarityProd  Env = "MassclarityProd"
+)
+
+
 type CliConfig struct {
 	session                     *session.Session
 	Cloudformation              *cloudformation.CloudFormation
@@ -20,11 +37,12 @@ type CliConfig struct {
 	PlatformTemplateUrl         string
 	PemPath                     string
 	Auth                        ssh.AuthMethod
+	Environment					Env
 }
 
 func NewCliConfig() *CliConfig {
+	region := "us-east-1"
 	u, e := user.Current()
-
 	if e != nil {
 		fmt.Println(e)
 	}
@@ -35,11 +53,14 @@ func NewCliConfig() *CliConfig {
 	if err != nil {
 		fmt.Println(err)
 	}
-	s, _ := session.NewSession(&aws.Config{})
+	s, _ := session.NewSession(&aws.Config{
+		Region: &region,
+	})
 	return &CliConfig{
 		session:                     s,
 		Cloudformation:              cloudformation.New(s),
-		InfrastructureRepositoryUrl: "git@github.com/basketsavings/massclarity-platform.git",
+		InfrastructurePath:          u.HomeDir + "/.basket/massclarity-infrastructure",
+		InfrastructureRepositoryUrl: "git@github.com:basketsavings/massclarity-infrastructure.git",
 		Auth:                        sshAuth,
 	}
 }

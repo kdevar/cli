@@ -14,31 +14,8 @@
 
 package main
 
-import (
-	"gopkg.in/src-d/go-git.v4"
-	"fmt"
-	ssh2"gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
-	"os"
-	"os/user"
-)
+import "github.com/kdevar/cli/cmd"
 
 func main() {
-	u, e := user.Current()
-
-	if e != nil {
-		fmt.Println(e)
-	}
-
-	fmt.Println(u.HomeDir)
-	sshAuth, err := ssh2.NewPublicKeysFromFile("git", u.HomeDir+"/.ssh/id_rsa", "password")
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	git.PlainClone("~/.basket", false, &git.CloneOptions{
-		URL: "git@github.com/basketsavings/massclarity-platform.git",
-		Auth: sshAuth,
-		Progress:os.Stdout,
-	})
+	cmd.Execute()
 }
